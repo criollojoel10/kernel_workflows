@@ -91,11 +91,11 @@ jobs:
             folder: "KernelSU"
             branch: "main"
             susfsless_kernel_patches: "scope-min-hooks-v1.9.patch"
-            extra_configs: "CONFIG_KPM=y CONFIG_KSU_TOOLKIT_SUPPORT=y"
+            extra_configs: "CONFIG_KSU_TOOLKIT_SUPPORT=y"
             susfs_configs: "CONFIG_KSU_SUSFS=y"
             susfsless_configs: "CONFIG_KSU_MANUAL_HOOK=y"
             ak3_suffix: "-SukiSU"
-            kpm: "https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/latest/download/patch_linux"
+#            kpm: "https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/latest/download/patch_linux"
 
           - type: xxKSU
             ksu: true
@@ -103,7 +103,8 @@ jobs:
             repo: "backslashxx/KernelSU"
             folder: "KernelSU"
             branch: "master"
-            kernel_patches: "scope-min-hooks-v1.9.patch"
+#            kernel_patches: "scope-min-hooks-v1.9.patch"
+            extra_configs: "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y"
             ak3_suffix: "-xxKSU"
 
         susfs: [false]
