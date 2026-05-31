@@ -432,7 +432,7 @@ jobs:
         id: release_body
         run: |
           cat << EOF > release_body.md
-          Kernels w/ KSU (and forks) by @TheSillyOk
+          Kernels w/ KSU forks by @TheSillyOk
 
           Updated: ${{ env.date }}
 
@@ -446,7 +446,7 @@ jobs:
           -> KernelSU-Next (\`KSUN\`): [Releases](https://github.com/rifsxd/KernelSU-Next/releases) / [CI builds](https://t.me/ksunext_ci)
           -> xx's KernelSU (\`xxKSU\`): [Releases](https://github.com/backslashxx/KernelSU/releases) / [KowSU](https://t.me/kowsu_build)
 
-          Versions used for KernelSU variants & susfs:
+          Versions used for KernelSU variants:
           -> Rissu's KernelSU  (\`RKSU\`): [${{ env.RKSU_V }}](${{ env.RKSU_URL }})
           -> ReSukiSU (\`ReSUKI\`): [${{ env.ReSUKI_V }}](${{ env.ReSUKI.URL }})
           -> KernelSU Next (\`KSUN\`): [${{ env.KSUN_V }}](${{ env.KSUN_URL }})
