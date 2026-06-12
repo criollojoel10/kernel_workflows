@@ -79,7 +79,7 @@ jobs:
             branch: "main"
             susfs_branch: "susfs-rksu-master"
             kernel_patches: ""
-            susfsless_kernel_patches: "rksu_hook.patch"
+            susfsless_kernel_patches: "scope-min-hooks-v1.9.patch"
             susfs_kernel_patches: "susfs-2.0.0.patch susfs-inline-hooks.patch"
             extra_configs: "CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_SYSCALL_HOOK=n"
             susfs_configs: "CONFIG_KSU_SUSFS=y"
