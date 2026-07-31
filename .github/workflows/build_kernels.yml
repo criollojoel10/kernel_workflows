@@ -188,7 +188,7 @@ jobs:
             patch -p1 < "${{ env.workspace_folder }}/kernel_patches/python3.patch" || true
           fi
 
-          configs="CONFIG_LTO_CLANG=y CONFIG_LTO_CLANG_THIN=y CONFIG_HAVE_LTO_CLANG=y CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y CONFIG_MODVERSIONS=n CONFIG_KPROBES=n CONFIG_TMPFS_XATTR=y"
+          configs="CONFIG_LTO_CLANG=y CONFIG_LTO_CLANG_THIN=y CONFIG_HAVE_LTO_CLANG=y CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE=y CONFIG_MODVERSIONS=n CONFIG_TMPFS_XATTR=y CONFIG_KALLSYMS_ALL=y CONFIG_KALLSYMS=y"
           if [[ -n "${{ matrix.build.extra_configs }}" ]]; then
             configs="$configs ${{ matrix.build.extra_configs }}"
           fi
