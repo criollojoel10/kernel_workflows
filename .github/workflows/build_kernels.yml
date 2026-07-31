@@ -60,30 +60,16 @@ jobs:
             exclude: susfs
             ak3_suffix: ""
 
-          - type: KSUN
-            ksu: true
-            repo: "KernelSU-Next/KernelSU-Next"
-            folder: "KernelSU-Next"
-            branch: "legacy"
-            susfs_ksu_patches: "KSUN/KSUN-SUSFS-2.0.0.patch"
-            kernel_patches: "seccomp.patch scope-min-hooks-v1.6.patch"
-            susfs_kernel_patches: "susfs-2.0.0.patch"
-            extra_configs: "CONFIG_KSU_KPROBES_HOOK=n"
-            ak3_suffix: "-KSUNext"
-
-          - type: RKSU
-            ksu: true
-            exclude: susfs
-            repo: "rsuntk/KernelSU"
-            folder: "KernelSU"
-            branch: "main"
-            susfs_branch: "susfs-rksu-master"
-            kernel_patches: ""
-            susfsless_kernel_patches: "scope-min-hooks-v1.9.patch"
-            susfs_kernel_patches: "susfs-2.0.0.patch susfs-inline-hooks.patch"
-            extra_configs: "CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_SYSCALL_HOOK=n"
-            susfs_configs: "CONFIG_KSU_SUSFS=y"
-            ak3_suffix: "-RKSU"
+#          - type: KSUN
+#            ksu: true
+#            repo: "KernelSU-Next/KernelSU-Next"
+#            folder: "KernelSU-Next"
+#            branch: "legacy"
+#            susfs_ksu_patches: "KSUN/KSUN-SUSFS-2.0.0.patch"
+#            kernel_patches: "seccomp.patch scope-min-hooks-v1.6.patch"
+#            susfs_kernel_patches: "susfs-2.0.0.patch"
+#            extra_configs: "CONFIG_KSU_KPROBES_HOOK=n"
+#            ak3_suffix: "-KSUNext"
 
           - type: ReSukiSU
             ksu: true
