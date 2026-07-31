@@ -76,7 +76,7 @@ jobs:
             repo: "ReSukiSU/ReSukiSU"
             folder: "KernelSU"
             branch: "main"
-            susfsless_kernel_patches: "scope-min-hooks-v1.9.patch"
+            susfsless_kernel_patches: "scope-min-hooks-v1.9.patch selinux_stuff.patch"
             extra_configs: "CONFIG_KSU_TOOLKIT_SUPPORT=y"
             susfs_configs: "CONFIG_KSU_SUSFS=y"
             susfsless_configs: "CONFIG_KSU_MANUAL_HOOK=y"
