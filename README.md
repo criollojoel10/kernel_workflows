@@ -6,9 +6,9 @@ pineado al último source validado en dispositivo, con soporte [Droidspaces](htt
 
 - Workflow: [.github/workflows/build_kernels.yml](.github/workflows/build_kernels.yml)
 - Lanzamiento manual: pestaña **Actions -> Kernel Build -> Run workflow** (`workflow_dispatch`)
-- Release actual: [`2026/08/23-r1`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r1)
-  -> `2026.08.23-MiA3-SukiSU-SM6125-23.2-6.zip`
-  ([run 32615867985](https://github.com/criollojoel10/kernel_workflows/actions/runs/32615867985))
+- Release actual: [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2)
+  -> `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip` (incluye `CONFIG_USER_NS=y`)
+  ([run 32657084311](https://github.com/criollojoel10/kernel_workflows/actions/runs/32657084311))
 
 ## Qué compila este fork
 
@@ -88,9 +88,11 @@ si algún controlador opcional quedó fuera.
 3. **`ksu_commit`**: pin de ReSukiSU a `88dbc78` (los HEAD móviles de los repos KSU son otra
    variable de riesgo; el build bueno usaba ese commit exacto).
 4. Paso Droidspaces no-destructivo (ver arriba) + retirado `CGROUP_NET_PRIO` (no compila).
-5. `Download Artifacts` con `pattern: "*"` + `merge-multiple: false`: con un solo artefacto,
-   `download-artifact@v8` extrae sin carpeta contenedora y `upload-assets.sh` de upstream
-   publicaba `META-INF.zip`/`tools.zip` en vez del zip de AnyKernel3.
+5. Upload de assets definitivo: `download-artifact@v8` extrae sin carpeta contenedora
+   incluso con `pattern: "*"` + `merge-multiple: false`, y `upload-assets.sh` de upstream
+   publicaba `META-INF.zip`/`tools.zip`. Ahora "Upload Release Assets" descarga el zip
+   del artifact directo por API (el artifact zip ES el paquete AnyKernel3) y lo publica
+   con `gh release upload --clobber`.
 6. Cron diario desactivado (`schedule` comentado): builds manuales.
 7. Telegram `continue-on-error: true` (este fork no tiene `TELEGRAM_BOT_TOKEN`).
 
@@ -107,8 +109,15 @@ si algún controlador opcional quedó fuera.
 - **Run [#32615674277](https://github.com/criollojoel10/kernel_workflows/actions/runs/32615674277)** (falla de CI):
   `CGROUP_NET_PRIO=y` no compila en este árbol. Retirado del set.
 - **Assets rotos en release**: `META-INF.zip`/`tools.zip` por comportamiento de
-  `download-artifact@v8` con artefacto único. Corregido en el workflow y reparado el release
-  subiendo `2026.08.23-MiA3-SukiSU-SM6125-23.2-6.zip` manualmente.
+  `download-artifact@v8` con artefacto único (recurrente incluso tras el intento con
+  `pattern`/`merge-multiple`). Fix definitivo vía subida directa por API; releases r1 y r2
+  reparados manualmente (`...-6.zip` y `...-7.zip`).
+- **Kernel validado en dispositivo**: el build de [run 32615867985](https://github.com/criollojoel10/kernel_workflows/actions/runs/32615867985)
+  (`...-6.zip`) arranca perfecto; check Droidspaces todo OK salvo User namespace (opcional).
+- **[Run 32657084311](https://github.com/criollojoel10/kernel_workflows/actions/runs/32657084311)**
+  añade `CONFIG_USER_NS=y` (último opcional pendiente: Docker/Flatpak/Bubblewrap) ->
+  release [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2),
+  asset `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip`.
 
 ## Si volviera a bootloopear (plan de bisección)
 
