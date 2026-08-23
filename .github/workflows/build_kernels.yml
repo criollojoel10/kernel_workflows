@@ -27,21 +27,8 @@ jobs:
             defconfig: "vendor/trinket-perf_defconfig"
             config: "vendor/xiaomi-trinket.config vendor/laurel_sprout.config"
             patches_folder: "sm6125"
+            base_kernel_patches: "ptrace_fix.patch kpatch_fix.patch"
             IN_DTBO: "out/arch/arm64/boot/dts/xiaomi/laurel_sprout-trinket-overlay.dtbo"
-
-          - kernel_name: "N18.1"
-            kernel_url: "https://github.com/TheSillyOk/kernel_laurel_sprout"
-            kernel_branch: "lineage-18.1"
-            tag: "NoName-18.1"
-            defconfig: "vendor/laurel_sprout-perf_defconfig"
-            python3_patch: true
-
-          - kernel_name: "N-VIC"
-            kernel_url: "https://github.com/TheSillyOk/kernel_laurel_sprout"
-            kernel_branch: "vic"
-            tag: "NoName-VIC"
-            defconfig: "vendor/laurel_sprout-perf_defconfig"
-            python3_patch: true
 
         build:
           - type: Normal
@@ -165,7 +152,7 @@ jobs:
 
           cd "${{ env.workspace_folder }}/kernel_tree"
 
-          kernel_patches="fix_lto.patch ptrace_fix.patch kpatch_fix.patch"
+          kernel_patches="${{ matrix.kernel_config.base_kernel_patches || 'fix_lto.patch ptrace_fix.patch kpatch_fix.patch' }}"
           if [[ -n "${{ matrix.build.kernel_patches }}" ]]; then
             kernel_patches="$kernel_patches ${{ matrix.build.kernel_patches }}"
           fi
@@ -209,8 +196,12 @@ jobs:
           git -C "${{ env.workspace_folder }}/droidspaces" sparse-checkout set Documentation/resources/kernel-patches/non-GKI
 
           for patch_file in "${{ env.workspace_folder }}/droidspaces/Documentation/resources/kernel-patches/non-GKI/"*.patch; do
+            if ! patch -p1 --dry-run < "$patch_file" > /dev/null 2>&1; then
+              echo "::warning::Skipping $(basename "$patch_file") (not applicable to this kernel source)"
+              continue
+            fi
             echo "--> Applying $(basename "$patch_file") <--"
-            patch -p1 < "$patch_file" || echo "::warning::Failed to apply $(basename "$patch_file"), continuing without it"
+            patch -p1 < "$patch_file"
           done
 
       - name: Apply KSU (${{ matrix.build.type }})
