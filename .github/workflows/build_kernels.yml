@@ -31,6 +31,8 @@ jobs:
             defconfig: "vendor/trinket-perf_defconfig"
             config: "vendor/xiaomi-trinket.config vendor/laurel_sprout.config"
             patches_folder: "sm6125"
+            # fix_lto skipped: its content is already integrated in this source
+            base_kernel_patches: "ptrace_fix.patch kpatch_fix.patch"
             IN_DTBO: "out/arch/arm64/boot/dts/xiaomi/laurel_sprout-trinket-overlay.dtbo"
 
         build:
