@@ -56,10 +56,13 @@ Paso del workflow: **"Add Droidspaces Support (non-GKI)"**, con política **no-d
    cgroups (`CGROUP_DEVICE`, `CGROUP_PIDS`...), `DEVTMPFS`, IPC (`SYSVIPC`, `POSIX_MQUEUE`)...
    - En este kernel el único flip real es **`PID_NS=y`** (requisito fatal de Droidspaces,
      venía explícitamente desactivado por el vendor). Todo lo demás ya estaba activo o es no-op.
-2. **Opcionales** (OVERLAY_FS, NF_TABLES, extras NAT, USER_NS, FW_LOADER_USER_HELPER...)
+2. **Opcionales** (OVERLAY_FS, NF_TABLES, extras NAT, FW_LOADER_USER_HELPER...)
    solo se añaden si el símbolo **no existe** en el defconfig; las decisiones del vendor se respetan.
 3. **`CONFIG_ANDROID_PARANOID_NETWORK=n`** siempre (requisito documentado para red en contenedores).
-4. Se retiró `CONFIG_CGROUP_NET_PRIO`: **no compila** en este árbol
+4. **`CONFIG_USER_NS=y`** forzado: último opcional pendiente, añadido tras validar el kernel
+   en dispositivo. Necesario para Docker en algunos kernels y apps sandboxeadas
+   (Flatpak, Bubblewrap, navegadores); activable por contenedor con `--allow-userns`.
+5. Se retiró `CONFIG_CGROUP_NET_PRIO`: **no compila** en este árbol
    (`netprio_cgroup.h:35: no member named 'id' in 'struct cgroup'`) y no es requisito fatal.
 5. Parches non-GKI de Droidspaces-OSS con verificación previa (`patch --dry-run`);
    lo que no aplique a esta fuente se omite con warning:
