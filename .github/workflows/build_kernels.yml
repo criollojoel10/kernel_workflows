@@ -22,19 +22,22 @@ jobs:
           - kernel_name: "SM6125"
             kernel_url: "https://github.com/LineageOS/android_kernel_xiaomi_sm6125"
             kernel_branch: "lineage-23.2"
+            # Pinned to the same source as the known-good build
+            # 2026.07.31-MiA3-SukiSU-SM6125-23.2-681 (last commit before
+            # the 2026-08-14 LineageOS push that bootloops)
+            kernel_commit: "dbc6d0dab1093092d15c64ffd79a713ba214c107"
             anykernel_branch: "sm6125"
             tag: "SM6125-23.2"
             defconfig: "vendor/trinket-perf_defconfig"
             config: "vendor/xiaomi-trinket.config vendor/laurel_sprout.config"
             patches_folder: "sm6125"
-            base_kernel_patches: "ptrace_fix.patch kpatch_fix.patch"
             IN_DTBO: "out/arch/arm64/boot/dts/xiaomi/laurel_sprout-trinket-overlay.dtbo"
 
         build:
-          - type: Normal
-            ksu: false
-            exclude: susfs
-            ak3_suffix: ""
+#          - type: Normal
+#            ksu: false
+#            exclude: susfs
+#            ak3_suffix: ""
 
 #          - type: KSUN
 #            ksu: true
@@ -52,6 +55,9 @@ jobs:
             repo: "ReSukiSU/ReSukiSU"
             folder: "KernelSU"
             branch: "main"
+            # Same ReSukiSU commit as the known-good build
+            # 2026.07.31-MiA3-SukiSU-SM6125-23.2-681
+            ksu_commit: "88dbc78682a3364d27ad34551943e18615abf868"
             susfsless_kernel_patches: "scope-min-hooks-v1.9.patch selinux_stuff.patch"
             extra_configs: "CONFIG_KSU_TOOLKIT_SUPPORT=y"
             susfs_configs: "CONFIG_KSU_SUSFS=y"
@@ -59,16 +65,15 @@ jobs:
             ak3_suffix: "-SukiSU"
 #            kpm: "https://github.com/SukiSU-Ultra/SukiSU_KernelPatch_patch/releases/latest/download/patch_linux"
 
-          - type: xxKSU
-            ksu: true
-            exclude: susfs
-            repo: "backslashxx/KernelSU"
-            folder: "KernelSU"
-            branch: "master"
-#            kernel_patches: "scope-min-hooks-v1.9.patch"
-            extra_configs: "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y"
-            ak3_suffix: "-xxKSU"
-
+#          - type: xxKSU
+#            ksu: true
+#            exclude: susfs
+#            repo: "backslashxx/KernelSU"
+#            folder: "KernelSU"
+#            branch: "master"
+##            kernel_patches: "scope-min-hooks-v1.9.patch"
+#            extra_configs: "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y"
+#            ak3_suffix: "-xxKSU"
         susfs: [false]
         exclude:
           - build:
@@ -99,7 +104,7 @@ jobs:
 
           ${{ matrix.susfs || false }} && ksu_repo="${{ matrix.build.susfs_repo || matrix.build.repo }}" || ksu_repo="${{ matrix.build.repo }}" || true
           echo "ksu_repo=$ksu_repo" >> $GITHUB_ENV
-          ${{ matrix.susfs || false }} && ksu_branch="${{ matrix.build.susfs_branch || matrix.build.branch }}" || ksu_branch="${{ matrix.build.branch }}" || true
+          ${{ matrix.susfs || false }} && ksu_branch="${{ matrix.build.susfs_branch || matrix.build.branch }}" || ksu_branch="${{ matrix.build.ksu_commit || matrix.build.branch }}" || true
           echo "ksu_branch=$ksu_branch" >> $GITHUB_ENV
 
 
@@ -146,6 +151,12 @@ jobs:
           set -e
           echo "kernel_folder=${{ env.workspace_folder }}/kernel_tree" >> $GITHUB_ENV
           git clone --depth=1 "${{ matrix.kernel_config.kernel_url }}" ${{ env.kernel_branch_arg }} "${{ env.workspace_folder }}/kernel_tree"
+
+          if [[ -n "${{ matrix.kernel_config.kernel_commit }}" ]]; then
+            git -C "${{ env.workspace_folder }}/kernel_tree" fetch --depth=1 origin "${{ matrix.kernel_config.kernel_commit }}"
+            git -C "${{ env.workspace_folder }}/kernel_tree" checkout --detach FETCH_HEAD
+            echo "-> kernel pinned to ${{ matrix.kernel_config.kernel_commit }}"
+          fi
 
           echo "patches_dir=${{ env.workspace_folder }}/kernel_patches" >> $GITHUB_ENV
           git clone --depth=1 "${{ env.patches_url }}" ${{ env.patches_branch_arg }} "${{ env.workspace_folder }}/kernel_patches"
