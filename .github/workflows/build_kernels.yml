@@ -412,6 +412,8 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           path: ./downloaded-artifacts
+          pattern: "*"
+          merge-multiple: false
 
       - name: Set Release Variables
         id: release_vars
