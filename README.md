@@ -9,6 +9,9 @@ pineado al último source validado en dispositivo, con soporte [Droidspaces](htt
 - Release actual: [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2)
   -> `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip` (incluye `CONFIG_USER_NS=y`)
   ([run 32657084311](https://github.com/criollojoel10/kernel_workflows/actions/runs/32657084311))
+- ✅ **VALIDADO EN DISPOSITIVO (23-ago-2026)**: instalado vía `adb sideload`, arranca
+  correctamente y el check de Droidspaces v6.5.0 pasa al 100% — MUST HAVE ✓,
+  RECOMMENDED ✓ y OPTIONAL ✓ (incluido User namespace).
 
 ## Qué compila este fork
 
@@ -112,14 +115,27 @@ si algún controlador opcional quedó fuera.
   `download-artifact@v8` con artefacto único (recurrente incluso tras el intento con
   `pattern`/`merge-multiple`). Fix definitivo vía subida directa por API; releases r1 y r2
   reparados manualmente (`...-6.zip` y `...-7.zip`).
-- **Kernel validado en dispositivo**: el build de [run 32615867985](https://github.com/criollojoel10/kernel_workflows/actions/runs/32615867985)
+- **Kernel base validado en dispositivo**: el build de [run 32615867985](https://github.com/criollojoel10/kernel_workflows/actions/runs/32615867985)
   (`...-6.zip`) arranca perfecto; check Droidspaces todo OK salvo User namespace (opcional).
 - **[Run 32657084311](https://github.com/criollojoel10/kernel_workflows/actions/runs/32657084311)**
   añade `CONFIG_USER_NS=y` (último opcional pendiente: Docker/Flatpak/Bubblewrap) ->
   release [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2),
   asset `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip`.
+- **✅ VALIDACIÓN FINAL (23-ago-2026)**: `2026/08/23-r2` instalado vía `adb sideload`,
+  arranque correcto y check Droidspaces v6.5.0 al 100%:
 
-## Si volviera a bootloopear (plan de bisección)
+  ```
+  [MUST HAVE]    Root ✓ Linux version ✓ PID ns ✓ Mount ns ✓ UTS ns ✓ IPC ns ✓
+                 pivot_root ✓ /proc ✓ /sys ✓ Seccomp ✓
+  [RECOMMENDED]  epoll ✓ signalfd ✓ PTY ✓ devpts ✓ Loop ✓ ext4 ✓ Cgroup v2 ✓
+                 Cgroup ns ✓ devtmpfs ✓
+  [OPTIONAL]     IPv6 ✓ FUSE ✓ TUN/TAP ✓ OverlayFS ✓ Network ns ✓ Bridge ✓
+                 Veth ✓ User namespace ✓
+  ```
+
+  El soporte Droidspaces del kernel queda completo; no quedan configs pendientes.
+
+## Si volviera a bootloopear en un futuro (plan de bisección)
 
 1. Flashear referencia pura sin el paso Droidspaces (mismo pin): si arranca, el problema está
    en las configs/parches de Droidspaces.
