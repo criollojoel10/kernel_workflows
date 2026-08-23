@@ -529,7 +529,17 @@ jobs:
         env:
          GH_TOKEN: ${{ github.token }}
         run: |
-          bash ${{ env.sh_dir }}/upload-assets.sh "${{ env.TAG }}" "${{ env.repo_dir }}" "${{ env.artifacts_dir }}"
+          set -e
+          mkdir -p rel_assets
+          gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
+            --jq '.artifacts[] | "\(.id)\t\(.name)"' | while IFS="$(printf '\t')" read -r aid aname; do
+            echo "-> Fetching artifact $aname (id $aid)"
+            curl -sfL -H "Authorization: Bearer ${GH_TOKEN}" \
+              -o "rel_assets/$aname.zip" \
+              "https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$aid/zip"
+          done
+          ls -la rel_assets/
+          gh release upload "${{ env.TAG }}" rel_assets/*.zip --clobber
 
       - name: Send Telegram Notification
         if: always()
