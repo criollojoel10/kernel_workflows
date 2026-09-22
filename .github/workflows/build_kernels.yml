@@ -74,6 +74,12 @@ jobs:
             # otherwise). scope-min-hooks-v1.9.patch provides the manual
             # hooks and is the same patch the ReSukiSU build applies.
             kernel_patches: "scope-min-hooks-v1.9.patch"
+            # this fork ships only the SUSFS userspace/managers side: the
+            # kernel-side (linux/susfs.h, fs/susfs.c...) comes from the
+            # standard susfs-2.0.0.patch plus TheSillyOk's sm6125 fix for
+            # the SPOOF_CMDLINE_OR_BOOTCONFIG part. Same recipe upstream
+            # used for the old KSUN/SUSFS SM6125 builds (2025.08.14-...-22.2).
+            susfs_kernel_patches: "susfs-2.0.0.patch sm6125/fix_susfs_rejects.patch"
             susfs_configs: "CONFIG_KSU=y CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_KPROBES_HOOK=n CONFIG_KSU_SUSFS=y CONFIG_KSU_SUSFS_SUS_PATH=y CONFIG_KSU_SUSFS_SUS_MOUNT=n CONFIG_KSU_SUSFS_SUS_KSTAT=y CONFIG_KSU_SUSFS_TRY_UMOUNT=n CONFIG_KSU_SUSFS_SPOOF_UNAME=y CONFIG_KSU_SUSFS_ENABLE_LOG=y CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y CONFIG_KSU_SUSFS_OPEN_REDIRECT=y CONFIG_KSU_SUSFS_SUS_MAP=y"
             ak3_suffix: "-KSUNext"
 
