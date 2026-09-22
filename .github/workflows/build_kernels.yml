@@ -69,6 +69,11 @@ jobs:
             folder: "KernelSU-Next"
             branch: "legacy-susfs-v2"
             exclude: susfsless
+            # KernelSU-Next legacy-susfs-v2 in manual-hook mode requires
+            # ksu_handle_sys_reboot in kernel/reboot.c (its Kbuild aborts
+            # otherwise). scope-min-hooks-v1.9.patch provides the manual
+            # hooks and is the same patch the ReSukiSU build applies.
+            kernel_patches: "scope-min-hooks-v1.9.patch"
             susfs_configs: "CONFIG_KSU=y CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_KPROBES_HOOK=n CONFIG_KSU_SUSFS=y CONFIG_KSU_SUSFS_SUS_PATH=y CONFIG_KSU_SUSFS_SUS_MOUNT=n CONFIG_KSU_SUSFS_SUS_KSTAT=y CONFIG_KSU_SUSFS_TRY_UMOUNT=n CONFIG_KSU_SUSFS_SPOOF_UNAME=y CONFIG_KSU_SUSFS_ENABLE_LOG=y CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y CONFIG_KSU_SUSFS_OPEN_REDIRECT=y CONFIG_KSU_SUSFS_SUS_MAP=y"
             ak3_suffix: "-KSUNext"
 
