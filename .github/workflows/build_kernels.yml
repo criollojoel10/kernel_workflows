@@ -61,14 +61,22 @@ jobs:
 # - susfs_configs = espejo de vendor/susfs.config de moonwake_kernel_xiaomi_ruby,
 #   filtradas a las opciones que EXISTEN en kernel/Kconfig de esta rama
 #   (las AUTO_ADD_*/SUS_OVERLAYFS/etc. no existen en ese Kconfig y se omiten).
-# - se excluye la combinacion (KSUNext, susfs:false) con "exclude: susfsless",
+# - se excluye la combinacion (KSUNext-*, susfs:false) con "exclude: susfsless",
 #   de la misma forma que "exclude: susfs" descarta ReSukiSU+SUSFS.
+# - "droidspaces" gatea el paso 'Add Droidspaces Support': true (o ausente)
+#   aplica Droidspaces; false lo omite. Variantes por probar en dispositivo:
+#     > KSUNext-SuSFS  : espejo MoonWake, CON Droidspaces (build de referencia).
+#     > KSUNext-Ruby   : idéntica config, SIN Droidspaces (base limpia "Ruby").
+#     > KSUNext-Ginkgo : config alineada con el kernel sm6125/4.14 de ginkgo
+#       (fnxln/kernel_xiaomi_ginkgo_ksu): SUS_MOUNT=y TRY_UMOUNT=y (en MoonWake
+#       están en n) + CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED=y, SIN Droidspaces.
           - type: KSUNext-SuSFS
             ksu: true
             repo: "DXRN-MoonWake/KernelSU-Next"
             folder: "KernelSU-Next"
             branch: "legacy-susfs-v2"
             exclude: susfsless
+            droidspaces: true
             # KernelSU-Next legacy-susfs-v2 in manual-hook mode requires
             # ksu_handle_sys_reboot in kernel/reboot.c (its Kbuild aborts
             # otherwise). scope-min-hooks-v1.9.patch provides the manual
@@ -83,12 +91,41 @@ jobs:
             susfs_configs: "CONFIG_KSU=y CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_KPROBES_HOOK=n CONFIG_KSU_SUSFS=y CONFIG_KSU_SUSFS_SUS_PATH=y CONFIG_KSU_SUSFS_SUS_MOUNT=n CONFIG_KSU_SUSFS_SUS_KSTAT=y CONFIG_KSU_SUSFS_TRY_UMOUNT=n CONFIG_KSU_SUSFS_SPOOF_UNAME=y CONFIG_KSU_SUSFS_ENABLE_LOG=y CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y CONFIG_KSU_SUSFS_OPEN_REDIRECT=y CONFIG_KSU_SUSFS_SUS_MAP=y"
             ak3_suffix: "-KSUNext"
 
+          - type: KSUNext-Ruby
+            ksu: true
+            repo: "DXRN-MoonWake/KernelSU-Next"
+            folder: "KernelSU-Next"
+            branch: "legacy-susfs-v2"
+            exclude: susfsless
+            droidspaces: false
+            kernel_patches: "scope-min-hooks-v1.9.patch"
+            susfs_kernel_patches: "susfs-2.0.0.patch sm6125/fix_susfs_rejects.patch"
+            susfs_configs: "CONFIG_KSU=y CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_KPROBES_HOOK=n CONFIG_KSU_SUSFS=y CONFIG_KSU_SUSFS_SUS_PATH=y CONFIG_KSU_SUSFS_SUS_MOUNT=n CONFIG_KSU_SUSFS_SUS_KSTAT=y CONFIG_KSU_SUSFS_TRY_UMOUNT=n CONFIG_KSU_SUSFS_SPOOF_UNAME=y CONFIG_KSU_SUSFS_ENABLE_LOG=y CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y CONFIG_KSU_SUSFS_OPEN_REDIRECT=y CONFIG_KSU_SUSFS_SUS_MAP=y"
+            ak3_suffix: "-KSUNext.Ruby"
+
+          - type: KSUNext-Ginkgo
+            ksu: true
+            repo: "DXRN-MoonWake/KernelSU-Next"
+            folder: "KernelSU-Next"
+            branch: "legacy-susfs-v2"
+            exclude: susfsless
+            droidspaces: false
+            kernel_patches: "scope-min-hooks-v1.9.patch"
+            susfs_kernel_patches: "susfs-2.0.0.patch sm6125/fix_susfs_rejects.patch"
+            # Alineado con ginkgo (fnxln ginkgo-susfs): SUS_MOUNT=y y TRY_UMOUNT=y
+            # (auto-tagged mounts y try_umount del v2.0.0), igual que MoonWake
+            # para el resto. CC_DISABLE_WARN_MAYBE_UNINITIALIZED = compat Clang 18.
+            extra_configs: "CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED=y"
+            susfs_configs: "CONFIG_KSU=y CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_KPROBES_HOOK=n CONFIG_KSU_SUSFS=y CONFIG_KSU_SUSFS_SUS_PATH=y CONFIG_KSU_SUSFS_SUS_MOUNT=y CONFIG_KSU_SUSFS_SUS_KSTAT=y CONFIG_KSU_SUSFS_TRY_UMOUNT=y CONFIG_KSU_SUSFS_SPOOF_UNAME=y CONFIG_KSU_SUSFS_ENABLE_LOG=y CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y CONFIG_KSU_SUSFS_OPEN_REDIRECT=y CONFIG_KSU_SUSFS_SUS_MAP=y"
+            ak3_suffix: "-KSUNext.Ginkgo"
+
           - type: ReSukiSU
             ksu: true
             repo: "ReSukiSU/ReSukiSU"
             folder: "KernelSU"
             branch: "main"
             exclude: susfs
+            droidspaces: true
             # Same ReSukiSU commit as the known-good build
             # 2026.07.31-MiA3-SukiSU-SM6125-23.2-681
             ksu_commit: "88dbc78682a3364d27ad34551943e18615abf868"
@@ -223,6 +260,7 @@ jobs:
           sed -i 's/-dirty//' ./scripts/setlocalversion
 
       - name: Add Droidspaces Support (non-GKI)
+        if: matrix.build.droidspaces != false
         working-directory: ${{ env.kernel_folder }}
         run: |
           set -e

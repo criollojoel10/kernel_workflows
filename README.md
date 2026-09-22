@@ -2,13 +2,19 @@
 
 Fork de [TheSillyOk/kernel_workflows](https://github.com/TheSillyOk/kernel_workflows) adaptado para compilar
 **únicamente el kernel SM6125 (LineageOS 23.2 / Android 16) del Xiaomi Mi A3 (laurel_sprout),
-pineado al último source validado en dispositivo, con soporte [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS).**
+pineado al último source validado en dispositivo, con [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS)
+opcional por variante (algunas builds lo omiten para "ocultamiento puro").**
 
 - Workflow: [.github/workflows/build_kernels.yml](.github/workflows/build_kernels.yml)
 - Lanzamiento manual: pestaña **Actions -> Kernel Build -> Run workflow** (`workflow_dispatch`)
-- Release actual: [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2)
-  -> `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip` (incluye `CONFIG_USER_NS=y`)
-  ([run 32657084311](https://github.com/criollojoel10/kernel_workflows/actions/runs/32657084311))
+- Releases actuales:
+  - [`2026/09/22-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/09/22-r2)
+    -> `2026.09.22-MiA3-SukiSU-SM6125-23.2-12.zip` y
+    `2026.09.22-MiA3-KSUNext.SUSFS-SM6125-23.2-12.zip` (primer build KSUNext+SUSFS verde,
+    run [35676180713](https://github.com/criollojoel10/kernel_workflows/actions/runs/35676180713))
+  - [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2)
+    -> `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip` (incluye `CONFIG_USER_NS=y`)
+    ([run 32657084311](https://github.com/criollojoel10/kernel_workflows/actions/runs/32657084311))
 - ✅ **VALIDADO EN DISPOSITIVO (23-ago-2026)**: instalado vía `adb sideload`, arranca
   correctamente y el check de Droidspaces v6.5.0 pasa al 100% — MUST HAVE ✓,
   RECOMMENDED ✓ y OPTIONAL ✓ (incluido User namespace).
@@ -18,45 +24,60 @@ pineado al último source validado en dispositivo, con soporte [Droidspaces](htt
 | Variante | Kernel source | KSU | Android |
 |---|---|---|---|
 | SukiSU (ReSukiSU, manual hooks) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | ReSukiSU @ `88dbc78` (main, 30-jul-2026) | 16 (LOS 23.2) |
-| KSUNext-SuSFS (KernelSU-Next + SUSFS in-tree) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
+| KSUNext-SuSFS (KSUNext + SUSFS, con Droidspaces) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
+| KSUNext-Ruby (idem `KSUNext-SuSFS` sin Droidspaces) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
+| KSUNext-Ginkgo (config alineada con ginkgo sm6125, sin Droidspaces) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
 
 - Defconfig: `vendor/trinket-perf_defconfig` (+ fragments `vendor/xiaomi-trinket.config vendor/laurel_sprout.config`)
 - AnyKernel3: rama `sm6125` de TheSillyOk/anykernel
 - Artefacto/release: `YYYY.MM.DD-MiA3-SukiSU-SM6125-23.2-<run>.zip` (SukiSU) /
-  `YYYY.MM.DD-MiA3-KSUNext.SUSFS-SM6125-23.2-<run>.zip` (KSUNext-SuSFS)
-- Instalación probada por el propietario del fork vía `adb sideload`
+  `YYYY.MM.DD-MiA3-KSUNext.SUSFS-SM6125-23.2-<run>.zip` (KSUNext-SuSFS) /
+  `YYYY.MM.DD-MiA3-KSUNext.Ruby.SUSFS-SM6125-23.2-<run>.zip` (KSUNext-Ruby) /
+  `YYYY.MM.DD-MiA3-KSUNext.Ginkgo.SUSFS-SM6125-23.2-<run>.zip` (KSUNext-Ginkgo)
+- Instalación probada por el propietario del fork vía `adb sideload` (variantes SukiSU y KSUNext-SuSFS automáticas)
 
 Fuera del matrix respecto al upstream: **Ginkgo (Redmi Note 8)**, kernels **NoName 18.1/VIC**,
-y la variante **Normal** y **xxKSU** (comentadas en el YAML; en dispositivo solo se valida la variante SukiSU).
+y la variante **Normal** y **xxKSU** (comentadas en el YAML). La variante con nombre "Ginkgo"
+**sí** usa el mismo kernel SM6125 pero con la **config de SUSFS de ginkgo** (no el árbol de ginkgo),
+ver sección siguiente.
 
-## Variante KSUNext-SuSFS (planned, línea MoonWake/"Ruby")
+## Variantes KSUNext (línea MoonWake/"Ruby" + línea ginkgo)
 
-Nueva variante del matrix, 21-sep-2026, que integra **SUSFS v2.0.0 en-árbol** por la
-"línea MoonWake" (la misma que usa el kernel Ruby 4.19 del Note 12 Pro):
+Tres variantes sobre el mismo fork **KSUNext + SUSFS**, 21/22-sep-2026. Comparten:
 
 - **KSU**: fork [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next),
-  rama **`legacy-susfs-v2`**. El `kernel/setup.sh` de esa rama integra KernelSU-Next en
-  **non-GKI** (no toca GKI hosts; usa `drivers/`, symlink a `drivers/kernelsu`) y trae el
-  menú "KernelSU - SUSFS" **dentro del Kconfig del kernel** -> no hace falta ningún parche
-  externo de SUSFS (`susfs_ksu_patches`/`susfs_kernel_patches` vacíos en el matrix).
-- **Configs SUSFS** (`susfs_configs`): espejo de `arch/arm64/configs/vendor/susfs.config`
-  de DP-R/MoonWake `moonwake_kernel_xiaomi_ruby` (rama experimental), filtradas a las que
-  de verdad existen en el `kernel/Kconfig` de `legacy-susfs-v2`:
-  `KSU`, `KSU_MANUAL_HOOK`, `KSU_KPROBES_HOOK=n`, `KSU_SUSFS`, `KSU_SUSFS_SUS_PATH`,
-  `KSU_SUSFS_SUS_MOUNT=n`, `KSU_SUSFS_SUS_KSTAT`, `KSU_SUSFS_TRY_UMOUNT=n`,
-  `KSU_SUSFS_SPOOF_UNAME`, `KSU_SUSFS_ENABLE_LOG`, `KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS`,
-  `KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG`, `KSU_SUSFS_OPEN_REDIRECT`, `KSU_SUSFS_SUS_MAP`.
-  Se omiten las de MoonWake que **no existen** en este Kconfig (`AUTO_ADD_SUS_*`,
-  `SUS_OVERLAYFS`, `HAS_MAGIC_MOUNT`, `SUS_SU`) y las del `kernelsu.config`
-  (`KSU_LSM_SECURITY_HOOKS`, `KSU_MULTI_MANAGER_SUPPORT`).
-- **Matrix**: `build: [KSUNext-SuSFS, ReSukiSU]` × `susfs: [true, false]` con la regla
-  `exclude` que produce exactamente **2 builds**:
-  - `ReSukiSU` + `susfs:false` -> zip `-SukiSU` (el ya validado, sin SUSFS)
-  - `KSUNext-SuSFS` + `susfs:true` -> zip `-KSUNext.SUSFS` (SUSFS v2 on top of KernelSU-Next)
-- **Riesgo abierto**: rama diseñada para kernel 4.19 (Ruby); en 4.14 (SM6125) puede
-  requerir ajustes (por eso la variante upstream `KSUN/legacy` está comentada). Este build
-  es el **primer intento en 4.14**.
-- Estado: pendiente de primer run (ver sección Historial).
+  rama **`legacy-susfs-v2`**. Su `kernel/setup.sh` integra KernelSU-Next en **non-GKI**
+  (usa `drivers/`, symlink a `drivers/kernelsu`) y trae el menú "KernelSU - SUSFS" en el
+  Kconfig del kernel.
+- **Hooks manuales**: `kernel_patches: "scope-min-hooks-v1.9.patch"` (mismo patch que ReSukiSU;
+  la rama legacy-susfs-v2 aborta su Kbuild si no hay `ksu_handle_sys_reboot` en `kernel/reboot.c`).
+- **Kernel-side SUSFS**: `susfs_kernel_patches: "susfs-2.0.0.patch sm6125/fix_susfs_rejects.patch"`
+  (el fork solo trae la parte de KSU/managers; el kernel-side, `linux/susfs.h`/`fs/susfs.c`,
+  se inyecta con el parche estándar, igual que los builds upstream KSUN/SUSFS de 2025).
+- **Droidspaces**: el paso "Add Droidspaces Support" ahora se **gatea por variante**
+  (`droidspaces: true|false`). `KSUNext-SuSFS` y `ReSukiSU` la llevan; `Ruby` y `Ginkgo` no,
+  para tener builds de "ocultamiento puro" antes de mezclar contenedores/red.
+
+Diferencias entre ellas (config SUSFS):
+
+| Variante | `SUS_MOUNT` | `TRY_UMOUNT` | `CC_DISABLE_WARN_MAYBE_UNINITIALIZED` | Droidspaces | Suflijo zip |
+|---|---|---|---|---|---|
+| KSUNext-SuSFS | n (MoonWake) | n (MoonWake) | no | **sí** | `-KSUNext.SUSFS` |
+| KSUNext-Ruby | n (MoonWake) | n (MoonWake) | no | no | `-KSUNext.Ruby.SUSFS` |
+| KSUNext-Ginkgo | **y** | **y** | **y** | no | `-KSUNext.Ginkgo.SUSFS` |
+
+`SUS_MOUNT=y` + `TRY_UMOUNT=y` del build "Ginkgo" replican la config del kernel sm6125 4.14
+de ginkgo ([fnxln/kernel_xiaomi_ginkgo_ksu](https://github.com/fnxln/kernel_xiaomi_ginkgo_ksu),
+rama `ginkgo-susfs`): auto-tagged mounts y try_umount del v2.0.0 (los valores `n` de MoonWake
+desactivan esas funciones). `CONFIG_CC_DISABLE_WARN_MAYBE_UNINITIALIZED=y` = compat Clang 18.
+
+- **Matrix**: `build: [KSUNext-SuSFS, KSUNext-Ruby, KSUNext-Ginkgo, ReSukiSU]` ×
+  `susfs: [true, false]` con la regla `exclude` que produce exactamente **4 builds**:
+  - `ReSukiSU` + `susfs:false` -> zip `-SukiSU` (sin SUSFS, validado en dispositivo)
+  - `KSUNext-SuSFS/KSUNext-Ruby/KSUNext-Ginkgo` + `susfs:true` -> zips `-KSUNext*.SUSFS`
+- **Riesgo abierto**: la rama `legacy-susfs-v2` está diseñada para 4.19 (Ruby); en 4.14 el
+  primer run falló por hooks (arreglado) y por kernel-side SUSFS (arreglado). El build SUSFS
+  quedó compilando verde (2026-09-22).
 
 ## Por qué el kernel está pineado a `44758a72`
 
@@ -112,12 +133,15 @@ si algún controlador opcional quedó fuera.
 1. Base: `fix_lto.patch`, `ptrace_fix.patch`, `kpatch_fix.patch`
    ([TheSillyOk/kernel_ls_patches](https://github.com/TheSillyOk/kernel_ls_patches)) —
    verificados con dry-run contra `44758a72`; aplican igual que en el run #681.
-2. Droidspaces non-GKI (condicional, ver arriba)
+2. Droidspaces non-GKI (condicional por variante, ver arriba)
 3. ReSukiSU pineado: setup.sh @ `88dbc78` + `scope-min-hooks-v1.9.patch` + `selinux_stuff.patch`
+4. KSUNext (Ruby/Ginkgo/SuSFS): hooks `scope-min-hooks-v1.9.patch` +
+   kernel-side SUSFS `susfs-2.0.0.patch` + `sm6125/fix_susfs_rejects.patch`
 
 ## Diferencias técnicas vs upstream
 
-1. Matrix reducido: solo MiA3 SM6125-23.2 × variante SukiSU (Normal/xxKSU comentadas en el YAML).
+1. Matrix reducido: solo MiA3 SM6125-23.2 (Normal/xxKSU comentadas) con 4 variantes activas
+   (SukiSU, KSUNext-SuSFS, KSUNext-Ruby, KSUNext-Ginkgo).
 2. **`kernel_commit`**: pin del kernel a `44758a72` tras el force-push del 14-ago (ver arriba).
 3. **`ksu_commit`**: pin de ReSukiSU a `88dbc78` (los HEAD móviles de los repos KSU son otra
    variable de riesgo; el build bueno usaba ese commit exacto).
