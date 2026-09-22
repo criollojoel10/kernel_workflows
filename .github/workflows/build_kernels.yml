@@ -53,11 +53,31 @@ jobs:
 #            extra_configs: "CONFIG_KSU_KPROBES_HOOK=n"
 #            ak3_suffix: "-KSUNext"
 
+# MoonWake-style KSUNext + in-tree SUSFS v2 (linea "Ruby"):
+# - KernelSU-Next fork de XDL-MoonWake, branch legacy-susfs-v2: integra
+#   KSU + SUSFS (menu "KernelSU - SUSFS") sin parches externos.
+#   setup.sh auto-detecta non-GKI (usa drivers/, symlink kernel->drivers/kernelsu)
+#   y NO requiere kprobes (KSU_MANUAL_HOOK). Verificado via gh api 2026-09-21.
+# - susfs_configs = espejo de vendor/susfs.config de moonwake_kernel_xiaomi_ruby,
+#   filtradas a las opciones que EXISTEN en kernel/Kconfig de esta rama
+#   (las AUTO_ADD_*/SUS_OVERLAYFS/etc. no existen en ese Kconfig y se omiten).
+# - se excluye la combinacion (KSUNext, susfs:false) con "exclude: susfsless",
+#   de la misma forma que "exclude: susfs" descarta ReSukiSU+SUSFS.
+          - type: KSUNext-SuSFS
+            ksu: true
+            repo: "XDL-MoonWake/KernelSU-Next"
+            folder: "KernelSU-Next"
+            branch: "legacy-susfs-v2"
+            exclude: susfsless
+            susfs_configs: "CONFIG_KSU=y CONFIG_KSU_MANUAL_HOOK=y CONFIG_KSU_KPROBES_HOOK=n CONFIG_KSU_SUSFS=y CONFIG_KSU_SUSFS_SUS_PATH=y CONFIG_KSU_SUSFS_SUS_MOUNT=n CONFIG_KSU_SUSFS_SUS_KSTAT=y CONFIG_KSU_SUSFS_TRY_UMOUNT=n CONFIG_KSU_SUSFS_SPOOF_UNAME=y CONFIG_KSU_SUSFS_ENABLE_LOG=y CONFIG_KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS=y CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y CONFIG_KSU_SUSFS_OPEN_REDIRECT=y CONFIG_KSU_SUSFS_SUS_MAP=y"
+            ak3_suffix: "-KSUNext"
+
           - type: ReSukiSU
             ksu: true
             repo: "ReSukiSU/ReSukiSU"
             folder: "KernelSU"
             branch: "main"
+            exclude: susfs
             # Same ReSukiSU commit as the known-good build
             # 2026.07.31-MiA3-SukiSU-SM6125-23.2-681
             ksu_commit: "88dbc78682a3364d27ad34551943e18615abf868"
@@ -77,7 +97,7 @@ jobs:
 ##            kernel_patches: "scope-min-hooks-v1.9.patch"
 #            extra_configs: "CONFIG_KSU_TAMPER_SYSCALL_TABLE=y"
 #            ak3_suffix: "-xxKSU"
-        susfs: [false]
+        susfs: [true, false]
         exclude:
           - build:
               exclude: susfs
@@ -435,9 +455,9 @@ jobs:
           fi
           echo "tg_title=$title" >> $GITHUB_ENV
 
-          KSUN_URL=$(git ls-remote https://github.com/KernelSU-Next/KernelSU-Next.git legacy | awk '{print "https://github.com/KernelSU-Next/KernelSU-Next/commit/"$1}')
+          KSUN_URL=$(git ls-remote https://github.com/XDL-MoonWake/KernelSU-Next legacy-susfs-v2 | awk '{print "https://github.com/XDL-MoonWake/KernelSU-Next/commit/"$1}')
           echo "KSUN_URL=$KSUN_URL" >> $GITHUB_ENV
-          echo "KSUN_V=$(./sh/get_ksuver.sh "KernelSU-Next" "KernelSU-Next" "legacy")" >> $GITHUB_ENV
+          echo "KSUN_V=$(./sh/get_ksuver.sh "XDL-MoonWake" "KernelSU-Next" "legacy-susfs-v2")" >> $GITHUB_ENV
 
           RKSU_URL=$(git ls-remote https://github.com/rsuntk/KernelSU HEAD | awk '{print "https://github.com/rsuntk/KernelSU/commit/"$1}')
           echo "RKSU_URL=$RKSU_URL" >> $GITHUB_ENV

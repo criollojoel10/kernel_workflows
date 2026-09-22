@@ -18,14 +18,45 @@ pineado al último source validado en dispositivo, con soporte [Droidspaces](htt
 | Variante | Kernel source | KSU | Android |
 |---|---|---|---|
 | SukiSU (ReSukiSU, manual hooks) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | ReSukiSU @ `88dbc78` (main, 30-jul-2026) | 16 (LOS 23.2) |
+| KSUNext-SuSFS (KernelSU-Next + SUSFS in-tree) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [XDL-MoonWake/KernelSU-Next](https://github.com/XDL-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
 
 - Defconfig: `vendor/trinket-perf_defconfig` (+ fragments `vendor/xiaomi-trinket.config vendor/laurel_sprout.config`)
 - AnyKernel3: rama `sm6125` de TheSillyOk/anykernel
-- Artefacto/release: `YYYY.MM.DD-MiA3-SukiSU-SM6125-23.2-<run>.zip`
+- Artefacto/release: `YYYY.MM.DD-MiA3-SukiSU-SM6125-23.2-<run>.zip` (SukiSU) /
+  `YYYY.MM.DD-MiA3-KSUNext.SUSFS-SM6125-23.2-<run>.zip` (KSUNext-SuSFS)
 - Instalación probada por el propietario del fork vía `adb sideload`
 
 Fuera del matrix respecto al upstream: **Ginkgo (Redmi Note 8)**, kernels **NoName 18.1/VIC**,
-y las variantes **Normal** y **xxKSU** (comentadas en el YAML; solo se valida en dispositivo la variante SukiSU).
+y la variante **Normal** y **xxKSU** (comentadas en el YAML; en dispositivo solo se valida la variante SukiSU).
+
+## Variante KSUNext-SuSFS (planned, línea MoonWake/"Ruby")
+
+Nueva variante del matrix, 21-sep-2026, que integra **SUSFS v2.0.0 en-árbol** por la
+"línea MoonWake" (la misma que usa el kernel Ruby 4.19 del Note 12 Pro):
+
+- **KSU**: fork [XDL-MoonWake/KernelSU-Next](https://github.com/XDL-MoonWake/KernelSU-Next),
+  rama **`legacy-susfs-v2`**. El `kernel/setup.sh` de esa rama integra KernelSU-Next en
+  **non-GKI** (no toca GKI hosts; usa `drivers/`, symlink a `drivers/kernelsu`) y trae el
+  menú "KernelSU - SUSFS" **dentro del Kconfig del kernel** -> no hace falta ningún parche
+  externo de SUSFS (`susfs_ksu_patches`/`susfs_kernel_patches` vacíos en el matrix).
+- **Configs SUSFS** (`susfs_configs`): espejo de `arch/arm64/configs/vendor/susfs.config`
+  de DP-R/MoonWake `moonwake_kernel_xiaomi_ruby` (rama experimental), filtradas a las que
+  de verdad existen en el `kernel/Kconfig` de `legacy-susfs-v2`:
+  `KSU`, `KSU_MANUAL_HOOK`, `KSU_KPROBES_HOOK=n`, `KSU_SUSFS`, `KSU_SUSFS_SUS_PATH`,
+  `KSU_SUSFS_SUS_MOUNT=n`, `KSU_SUSFS_SUS_KSTAT`, `KSU_SUSFS_TRY_UMOUNT=n`,
+  `KSU_SUSFS_SPOOF_UNAME`, `KSU_SUSFS_ENABLE_LOG`, `KSU_SUSFS_HIDE_KSU_SUSFS_SYMBOLS`,
+  `KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG`, `KSU_SUSFS_OPEN_REDIRECT`, `KSU_SUSFS_SUS_MAP`.
+  Se omiten las de MoonWake que **no existen** en este Kconfig (`AUTO_ADD_SUS_*`,
+  `SUS_OVERLAYFS`, `HAS_MAGIC_MOUNT`, `SUS_SU`) y las del `kernelsu.config`
+  (`KSU_LSM_SECURITY_HOOKS`, `KSU_MULTI_MANAGER_SUPPORT`).
+- **Matrix**: `build: [KSUNext-SuSFS, ReSukiSU]` × `susfs: [true, false]` con la regla
+  `exclude` que produce exactamente **2 builds**:
+  - `ReSukiSU` + `susfs:false` -> zip `-SukiSU` (el ya validado, sin SUSFS)
+  - `KSUNext-SuSFS` + `susfs:true` -> zip `-KSUNext.SUSFS` (SUSFS v2 on top of KernelSU-Next)
+- **Riesgo abierto**: rama diseñada para kernel 4.19 (Ruby); en 4.14 (SM6125) puede
+  requerir ajustes (por eso la variante upstream `KSUN/legacy` está comentada). Este build
+  es el **primer intento en 4.14**.
+- Estado: pendiente de primer run (ver sección Historial).
 
 ## Por qué el kernel está pineado a `44758a72`
 
@@ -122,18 +153,9 @@ si algún controlador opcional quedó fuera.
   release [`2026/08/23-r2`](https://github.com/criollojoel10/kernel_workflows/releases/tag/2026/08/23-r2),
   asset `2026.08.23-MiA3-SukiSU-SM6125-23.2-7.zip`.
 - **✅ VALIDACIÓN FINAL (23-ago-2026)**: `2026/08/23-r2` instalado vía `adb sideload`,
-  arranque correcto y check Droidspaces v6.5.0 al 100%:
-
-  ```
-  [MUST HAVE]    Root ✓ Linux version ✓ PID ns ✓ Mount ns ✓ UTS ns ✓ IPC ns ✓
-                 pivot_root ✓ /proc ✓ /sys ✓ Seccomp ✓
-  [RECOMMENDED]  epoll ✓ signalfd ✓ PTY ✓ devpts ✓ Loop ✓ ext4 ✓ Cgroup v2 ✓
-                 Cgroup ns ✓ devtmpfs ✓
-  [OPTIONAL]     IPv6 ✓ FUSE ✓ TUN/TAP ✓ OverlayFS ✓ Network ns ✓ Bridge ✓
-                 Veth ✓ User namespace ✓
-  ```
-
-  El soporte Droidspaces del kernel queda completo; no quedan configs pendientes.
+  arranque correcto y check Droidspaces v6.5.0 al 100% (`[MUST HAVE]`, `[RECOMMENDED]` y
+  `[OPTIONAL]` completos, incluido User namespace). El soporte Droidspaces del kernel
+  queda completo; no quedan configs pendientes.
 
 ## Si volviera a bootloopear en un futuro (plan de bisección)
 
