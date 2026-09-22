@@ -561,6 +561,7 @@ jobs:
          GH_TOKEN: ${{ github.token }}
         run: |
           set -e
+          cd "${{ env.repo_dir }}"
           mkdir -p rel_assets
           gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts" \
             --jq '.artifacts[] | "\(.id)\t\(.name)"' | while IFS="$(printf '\t')" read -r aid aname; do
