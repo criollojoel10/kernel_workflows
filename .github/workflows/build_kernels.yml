@@ -54,7 +54,7 @@ jobs:
 #            ak3_suffix: "-KSUNext"
 
 # MoonWake-style KSUNext + in-tree SUSFS v2 (linea "Ruby"):
-# - KernelSU-Next fork de XDL-MoonWake, branch legacy-susfs-v2: integra
+# - KernelSU-Next fork de DXRN-MoonWake (ex XDL-MoonWake), branch legacy-susfs-v2: integra
 #   KSU + SUSFS (menu "KernelSU - SUSFS") sin parches externos.
 #   setup.sh auto-detecta non-GKI (usa drivers/, symlink kernel->drivers/kernelsu)
 #   y NO requiere kprobes (KSU_MANUAL_HOOK). Verificado via gh api 2026-09-21.
@@ -65,7 +65,7 @@ jobs:
 #   de la misma forma que "exclude: susfs" descarta ReSukiSU+SUSFS.
           - type: KSUNext-SuSFS
             ksu: true
-            repo: "XDL-MoonWake/KernelSU-Next"
+            repo: "DXRN-MoonWake/KernelSU-Next"
             folder: "KernelSU-Next"
             branch: "legacy-susfs-v2"
             exclude: susfsless
@@ -466,9 +466,9 @@ jobs:
           fi
           echo "tg_title=$title" >> $GITHUB_ENV
 
-          KSUN_URL=$(git ls-remote https://github.com/XDL-MoonWake/KernelSU-Next legacy-susfs-v2 | awk '{print "https://github.com/XDL-MoonWake/KernelSU-Next/commit/"$1}')
+          KSUN_URL=$(git ls-remote https://github.com/DXRN-MoonWake/KernelSU-Next legacy-susfs-v2 | awk '{print "https://github.com/DXRN-MoonWake/KernelSU-Next/commit/"$1}')
           echo "KSUN_URL=$KSUN_URL" >> $GITHUB_ENV
-          echo "KSUN_V=$(./sh/get_ksuver.sh "XDL-MoonWake" "KernelSU-Next" "legacy-susfs-v2")" >> $GITHUB_ENV
+          echo "KSUN_V=$(./sh/get_ksuver.sh "DXRN-MoonWake" "KernelSU-Next" "legacy-susfs-v2")" >> $GITHUB_ENV
 
           RKSU_URL=$(git ls-remote https://github.com/rsuntk/KernelSU HEAD | awk '{print "https://github.com/rsuntk/KernelSU/commit/"$1}')
           echo "RKSU_URL=$RKSU_URL" >> $GITHUB_ENV

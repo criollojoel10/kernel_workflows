@@ -18,7 +18,7 @@ pineado al último source validado en dispositivo, con soporte [Droidspaces](htt
 | Variante | Kernel source | KSU | Android |
 |---|---|---|---|
 | SukiSU (ReSukiSU, manual hooks) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | ReSukiSU @ `88dbc78` (main, 30-jul-2026) | 16 (LOS 23.2) |
-| KSUNext-SuSFS (KernelSU-Next + SUSFS in-tree) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [XDL-MoonWake/KernelSU-Next](https://github.com/XDL-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
+| KSUNext-SuSFS (KernelSU-Next + SUSFS in-tree) | LineageOS `lineage-23.2` @ `44758a7220f29c0b73009a8a45b0d86e335970d3` | [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next) `legacy-susfs-v2` | 16 (LOS 23.2) |
 
 - Defconfig: `vendor/trinket-perf_defconfig` (+ fragments `vendor/xiaomi-trinket.config vendor/laurel_sprout.config`)
 - AnyKernel3: rama `sm6125` de TheSillyOk/anykernel
@@ -34,7 +34,7 @@ y la variante **Normal** y **xxKSU** (comentadas en el YAML; en dispositivo solo
 Nueva variante del matrix, 21-sep-2026, que integra **SUSFS v2.0.0 en-árbol** por la
 "línea MoonWake" (la misma que usa el kernel Ruby 4.19 del Note 12 Pro):
 
-- **KSU**: fork [XDL-MoonWake/KernelSU-Next](https://github.com/XDL-MoonWake/KernelSU-Next),
+- **KSU**: fork [DXRN-MoonWake/KernelSU-Next](https://github.com/DXRN-MoonWake/KernelSU-Next),
   rama **`legacy-susfs-v2`**. El `kernel/setup.sh` de esa rama integra KernelSU-Next en
   **non-GKI** (no toca GKI hosts; usa `drivers/`, symlink a `drivers/kernelsu`) y trae el
   menú "KernelSU - SUSFS" **dentro del Kconfig del kernel** -> no hace falta ningún parche
